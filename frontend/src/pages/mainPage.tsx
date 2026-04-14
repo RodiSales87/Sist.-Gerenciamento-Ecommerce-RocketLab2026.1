@@ -1,56 +1,57 @@
-import { useEffect, useState } from 'react';
-import { ProductCard } from '../components/productCard';
-import { productService } from '../services/productService';
-import { Product } from '../types/product';
-import { Plus } from 'lucide-react';
+﻿import { Search, Monitor, BookOpen, Shirt, Utensils, Headphones, Gamepad2 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const CATEGORIES = [
+  { id: 'eletronicos', name: 'Eletrônicos', icon: Monitor },
+  { id: 'livros', name: 'Livros', icon: BookOpen },
+  { id: 'vestuario', name: 'Vestuário', icon: Shirt },
+  { id: 'casa', name: 'Casa e Cozinha', icon: Utensils },
+  { id: 'acessorios', name: 'Acessórios', icon: Headphones },
+  { id: 'games', name: 'Games', icon: Gamepad2 },
+];
 
 export function MainPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
-  // Assim que a tela carregar, chama a API!
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    try {
-      const data = await productService.getAll();
-      setProducts(data);
-    } catch (error) {
-      console.error("Erro ao buscar produtos da API:", error);
-    } finally {
-      setLoading(false);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/categoria/busca?q=${encodeURIComponent(searchTerm)}`);
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900">Catálogo de Produtos</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors shadow-sm cursor-pointer">
-          <Plus className="w-5 h-5" />
-          <span>Novo Produto</span>
-        </button>
-      </div>
+    <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
+      <div className="max-w-3xl w-full space-y-8">
+        <div className="space-y-4 flex justify-center w-full">
+          <img
+            src="/v-commerci_digital_logo.png"
+            alt="RocketLab"
+            className="h-48 md:h-64 lg:h-72 w-auto mx-auto object-contain"
+          />
+        </div>
 
-      {loading ? (
-        <div className="text-center py-20 text-gray-500 font-medium animate-pulse">
-          Carregando catálogo...
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map(product => (
-            <ProductCard key={product.id_produto} product={product} />
-          ))}
-          
-          {products.length === 0 && (
-            <div className="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
-              Nenhum produto encontrado. Clique em "Novo Produto" para começar!
-            </div>
-          )}
-        </div>
-      )}
+        <form onSubmit={handleSearch} className="relative w-full max-w-2xl mx-auto mt-12 mb-16 flex items-center group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-white/40 group-focus-within:text-primary transition-colors" />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar produtos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-[#111111] border border-white/10 rounded-l-md py-4 pl-12 pr-4 text-white placeholder-white/30 text-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-medium"
+          />
+          <button
+            type="submit"
+            className="bg-primary hover:bg-primary/90 text-black px-8 py-4 rounded-r-md font-bold text-lg transition-colors whitespace-nowrap"
+          >
+            Buscar
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

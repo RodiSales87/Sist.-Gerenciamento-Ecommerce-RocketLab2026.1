@@ -1,8 +1,16 @@
 import { api } from './api';
 import { Product, ProductCreate, ProductUpdate } from '../types/product';
 
+export interface Avaliacao {
+    id_avaliacao: string;
+    id_pedido: string;
+    avaliacao: number;
+    titulo_comentario?: string;
+    comentario?: string;
+}
+
 export const productService = {
-    getAll: async (skip = 0, limit = 100) => {
+    getAll: async (skip = 0, limit = 10000) => {  // <- MUDE O LIMIT PARA 10000 AQUI
         const response = await api.get<Product[]>('/produtos/', {
             params: { skip, limit }
         });
@@ -11,6 +19,11 @@ export const productService = {
 
     getById: async (id: string) => {
         const response = await api.get<Product>(`/produtos/${id}`);
+        return response.data;
+    },
+
+    getEvaluations: async (id: string) => {
+        const response = await api.get<Avaliacao[]>(`/produtos/${id}/avaliacoes`);
         return response.data;
     },
 

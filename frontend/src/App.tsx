@@ -1,27 +1,26 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+﻿import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { Header } from './components/header';
 import { MainPage } from './pages/mainPage';
+import { CategoriesPage } from './pages/categoriesPage';
+import { CategoryPage } from './pages/categoryPage';
+import { ProductDetailsPage } from './pages/productDetailsPage';
 
 export default function App() {
     return (
         <BrowserRouter>
-            {/* Container principal cinza claro pro fundo inteiro */}
-            <div className="min-h-screen bg-gray-50 font-sans">
-
-                {/* Header fixo base do nosso app */}
-                <header className="bg-white border-b border-gray-200 py-4 px-6 shadow-sm sticky top-0 z-10">
-                    <div className="max-w-7xl mx-auto flex items-center">
-                        <span className="text-2xl font-black text-blue-600 tracking-tighter">ROCKETLAB</span>
-                    </div>
-                </header>
-
-                {/* Carga das Rotas */}
-                <main>
+            <div className="min-h-screen bg-black text-white font-sans flex flex-col">
+                <Header />
+                <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <Routes>
                         <Route path="/" element={<MainPage />} />
-                        {/* Logo criaremos a rota: <Route path="/produtos/:id" element={<ProductPage />} /> */}
+                        <Route path="/categorias" element={<CategoriesPage />} />
+                        <Route path="/categoria/:categoryName" element={<CategoryPage />} />
+                        <Route path="/produto/:id" element={<ProductDetailsPage />} />
                     </Routes>
                 </main>
+                <Toaster richColors theme="dark" />
             </div>
         </BrowserRouter>
-    )
+    );
 }
