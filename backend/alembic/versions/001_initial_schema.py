@@ -35,6 +35,7 @@ def upgrade() -> None:
         sa.Column("comprimento_centimetros", sa.Float(), nullable=True),
         sa.Column("altura_centimetros", sa.Float(), nullable=True),
         sa.Column("largura_centimetros", sa.Float(), nullable=True),
+        
     )
 
     op.create_table(
