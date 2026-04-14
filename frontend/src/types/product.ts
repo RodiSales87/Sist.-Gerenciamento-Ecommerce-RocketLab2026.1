@@ -7,6 +7,7 @@ export interface Product {
   altura_centimetros?: number | null;
   largura_centimetros?: number | null;
   media_avaliacao?: number | null;
+  imagem_produto?: string | null;
 }
 
 export interface ProductCreate extends Omit<Product, 'id_produto' | 'media_avaliacao'> {
