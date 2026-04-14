@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.routers import produtos
 from app.routers import consumidores
 from app.routers import vendedores
@@ -11,6 +12,14 @@ app = FastAPI(
     title="Sistema de Compras Online",
     description="API para gerenciamento de pedidos, produtos, consumidores e vendedores.",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite qualquer front-end testar
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc
+    allow_headers=["*"],
 )
 
 @app.get("/", tags=["Health"])
