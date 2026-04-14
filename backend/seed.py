@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models.consumidor import Consumidor
@@ -41,7 +42,7 @@ def run_database_seed():
     try:
         print("📊 Iniciando carga de dados...")
 
-        # 1. Tabelas Independentes (Ordem de FK importa!)
+        # 1. Tabelas Independentes
         
         # PRODUTOS
         with open(f"{data_path}/dim_produtos.csv", encoding='utf-8') as f:
@@ -70,7 +71,7 @@ def run_database_seed():
             db.bulk_save_objects(vendedores)
         print("✅ Vendedores carregados.")
 
-        # 2. Tabelas Dependentes (Pedidos e Itens)
+        # 2. Tabelas Dependentes
         
         # PEDIDOS
         with open(f"{data_path}/fat_pedidos.csv", encoding='utf-8') as f:
@@ -110,17 +111,14 @@ def run_database_seed():
             for row in reader:
                 id_atual = row.get('id_avaliacao')
                 
-                # Só processa se o ID for novo (não estiver no set)
                 if id_atual and id_atual not in ids_vistos:
-                    # Converter campos de data/hora
                     row['avaliacao'] = int(row.get('avaliacao', 0))
                     row['data_comentario'] = parse_datetime(row.get('data_comentario', ''))
                     row['data_resposta'] = parse_datetime(row.get('data_resposta', ''))
                     
                     avaliacoes.append(AvaliacaoPedido(**row))
-                    ids_vistos.add(id_atual) # Registra que já vimos esse ID
+                    ids_vistos.add(id_atual)
 
-            # Agora o bulk_save não terá IDs duplicados
             db.bulk_save_objects(avaliacoes)
 
         print(f"✅ {len(avaliacoes)} Avaliações de Pedidos carregadas (duplicatas ignoradas).")
@@ -138,7 +136,6 @@ def run_database_seed():
             db.bulk_save_objects(categorias)
         print("✅ Categorias e Imagens carregadas.")
 
-        # --- ADICIONE ESTE BLOCO AQUI ---
         print("🔄 Calculando média de avaliações dos produtos...")
         from sqlalchemy import text
         db.execute(text("""
@@ -151,7 +148,17 @@ def run_database_seed():
             ), 0.0)
         """))
         print("✅ Médias calculadas e atualizadas com sucesso.")
-        # -------------------------------
+        
+        print("🔄 Distribuindo imagens base das categorias aos produtos...")
+        db.execute(text("""
+            UPDATE produtos
+            SET imagem_produto = (
+                SELECT link_imagem 
+                FROM categorias_imagens 
+                WHERE categorias_imagens.categoria_produto = produtos.categoria_produto
+            )
+        """))
+        print("✅ Imagens distribuídas aos produtos com sucesso.")
 
         db.commit()
 
@@ -163,5 +170,4 @@ def run_database_seed():
     finally:
         db.close()
 
-# Execução direta
 run_database_seed()

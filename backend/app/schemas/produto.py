@@ -19,6 +19,7 @@ class ProdutoUpdate(BaseModel):
     comprimento_centimetros: Optional[float] = None
     altura_centimetros: Optional[float] = None
     largura_centimetros: Optional[float] = None
+    imagem_produto: Optional[str] = None
 
 class ProdutoResponse(ProdutoBase):
     id_produto: str
